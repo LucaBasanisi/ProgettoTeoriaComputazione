@@ -28,37 +28,15 @@ In Java e Python la JVM o l'interprete proteggono lo sviluppatore. In C parliamo
 
 ---
 
-## 📋 Fasi di Apprendimento e Sviluppo
-
----
-
-### FASE 0: Primi Passi con l'Ambiente C (Zero Algoritmi, Solo Strumenti)
-
-- [ ] **Passo 0.1 — Come pensa un compilatore C**
-  - Differenza tra *Preprocessore* (`#include`, `#define`), *Compilatore* (`.c` $\rightarrow$ `.o`), e *Linker*.
-  - Compilare a mano un semplice `main.c` con `gcc -Wall -Wextra -std=c11`.
-
-- [ ] **Passo 0.2 — Setup di CMake e CLion**
-  - Creare un `CMakeLists.txt` pulito ed essenziale.
-  - Abilitare i warning massimi (`-Wall -Wextra -Wpedantic`) per farci avvisare dal compilatore al minimo errore.
-  - Attivare **AddressSanitizer** (`-fsanitize=address,undefined`): lo strumento magico che ti dice esattamente a che riga hai sbagliato l'accesso alla memoria.
-
-- [ ] **Passo 0.3 — Header (.h) vs Sorgente (.c)**
-  - Perché non si scrive tutto in un file solo.
-  - Capire cosa sono gli *include guards* (`#ifndef`, `#define`, `#endif`).
-  - Creare una prima funzioncina divisa tra `.h` e `.c` per verificare che il linking funzioni.
-
----
-
 ### FASE 1: Fondamenti di Memoria (Puntatori, Array e Stringhe)
 
 Prima di toccare il KMP, facciamo piccoli esercizi mirati su questi concetti:
 
-- [ ] **Passo 1.1 — I Puntatori senza paura**
+- [x] **Passo 1.1 — I Puntatori senza paura**
   - Operatore `&` (dammi l'indirizzo) e operatore `*` (dammi il valore a quell'indirizzo).
   - Passaggio di parametri per valore vs per riferimento (come modificare una variabile passata a una funzione).
 
-- [ ] **Passo 1.2 — Le Stringhe in C (`char*`)**
+- [x] **Passo 1.2 — Le Stringhe in C (`char*`)**
   - Cos'è il carattere nullo `'\0'` e perché se lo dimentichi il programma legge memoria a caso.
   - Funzioni standard essenziali da `<string.h>`: `strlen`, `strcmp`, `strcpy`.
   - Differenza tra string literal (in sola lettura) e array di caratteri modificabili.
@@ -73,23 +51,34 @@ Prima di toccare il KMP, facciamo piccoli esercizi mirati su questi concetti:
 
 ### FASE 2: Knuth-Morris-Pratt (Parte 1: Il Preprocessing e la Tabella π)
 
-Ora applichiamo le nozioni di base all'algoritmo KMP.
+Ora applichiamo le nozioni di base all'algoritmo KMP, esplorando le proprietà combinatorie più affascinanti della stringologia.
 
-- [ ] **Passo 2.1 — La Teoria della Failure Function ($\pi$)**
-  - Ripasso concettuale: perché calcoliamo il prefisso più lungo che è anche suffisso proprio.
-  - Calcolo manuale su carta della tabella per `"ABAABABA"`.
+- [ ] **Passo 2.1 — La Teoria della Failure Function ($\pi$) e i Bordi di una Stringa**
+  - Definizione formale: cos'è un *bordo* ($u$ è sia prefisso proprio che suffisso proprio di $w$).
+  - Perché la tabella $\pi$ memorizza esattamente la lunghezza del bordo massimale per ogni prefisso.
+  - Esercizio su carta: calcolo manuale della tabella per `"ABAABABA"` e `"AAAAAA"`.
 
-- [ ] **Passo 2.2 — Prima funzione algoritmica in C**
-  - Progettare la firma della funzione:
+- [ ] **Passo 2.2 — Prima funzione algoritmica in C e Proprietà dell'Induzione**
+  - Progettare la firma della funzione e il dilemma di memoria:
     ```c
     void kmp_compute_pi(const char *pattern, int *pi);
     ```
-    *(Nota: chi alloca l'array `pi`? Il chiamante o la funzione? Discuteremo i pro e contro di entrambe le scelte).*
-  - Implementazione riga per riga di `kmp_compute_pi`.
+    *(Chi alloca l'array `pi`? Il chiamante o la funzione? Discuteremo i pro e contro di entrambe le scelte: gestione stack vs heap, ownership del puntatore).*
+  - Implementazione riga per riga: il salto a ritroso induttivo `k = pi[k - 1]` (dimostrazione intuitiva del perché non si fanno passi a vuoto).
 
-- [ ] **Passo 2.3 — Testare la tabella $\pi$**
-  - Scrivere un piccolo test in un `main` o con un framework leggero (Unity).
-  - Verificare che su `"ABAABABA"` produca `[0, 0, 1, 1, 2, 3, 2, 3]`.
+- [ ] **Passo 2.3 — Algoritmic Curiosity: Riconoscere Periodi e Ripetizioni con $\pi$**
+  - *La magia matematica*: sapevi che la tabella $\pi$ ci rivela all'istante se una stringa è periodica (es. `"abcabcabc"`) in tempo $O(m)$?
+  - Teorema del Periodo: se $m \bmod (m - \pi[m-1]) == 0$, la stringa è composta da copie ripetute di un blocco!
+  - Scrivere una micro-funzione `bool is_periodic(const char *pattern, int *period_length)`.
+
+- [ ] **Passo 2.4 — Ottimizzazione Teorica: La Tabella $\pi$ Ristretta / Ottimizzata ($\pi^*$)**
+  - Il difetto nascosto del KMP classico: se facciamo mismatch su un carattere e indietreggiamo a un punto del pattern che ha *lo stesso identico carattere*, faremo un altro mismatch garantito al 100%!
+  - Costruzione della versione ottimizzata $\pi^*$ (detta anche *next table* o failure function forte) che salta direttamente oltre i mismatch ridondanti.
+  - Confronto empirico: quanti confronti inutili risparmia $\pi^*$ rispetto a $\pi$?
+
+- [ ] **Passo 2.5 — Test, Asserzioni e Profiling con AddressSanitizer**
+  - Scrivere una suite di micro-test con asserzioni (`assert.h`).
+  - Verificare casi patologici: stringhe con un solo carattere ripetuto (`"AAAAA"`), pattern senza bordi (`"ABCDE"`), stringhe palindrome (`"ABACABA"`).
   - Verifica assenza di leak con AddressSanitizer/Valgrind.
 
 ---
@@ -102,23 +91,35 @@ Ora applichiamo le nozioni di base all'algoritmo KMP.
     typedef struct {
         int *occurrences;    // Array dinamico di indici trovati
         int count;           // Quante occorrenze
+        int capacity;        // Capacità allocata
         int comparisons;     // Numero di confronti eseguiti
     } SearchResult;
     ```
-  - Scrivere la funzione per creare e soprattutto **distruggere** la struct:
+  - Pattern idiomatico di allocazione/deallocazione in C (il costruttore e distruttore manuale):
     ```c
+    SearchResult* search_result_create(void);
     void search_result_free(SearchResult *result);
     ```
 
-- [ ] **Passo 3.2 — Implementazione di `kmp_search`**
-  - Algoritmo di scansione del testo in $O(n)$ usando la tabella $\pi$.
-  - Gestione dinamica delle occorrenze trovate (introduzione a `realloc`).
-  - Conteggio del numero di confronti carattere per carattere.
+- [ ] **Passo 3.2 — Array Dinamici da Zero: Implementare un `std::vector` / `ArrayList` con `realloc`**
+  - Come fa Java a fare `list.add()` sotto il cofano?
+  - Gestione dinamica dell'array `occurrences`: quando `count == capacity`, raddoppiamo la memoria con `realloc`.
+  - Gestione sicura di `realloc`: evitare il memory leak catastrofico se `realloc` ritorna `NULL`.
 
-- [ ] **Passo 3.3 — Test sui casi limite**
-  - Pattern non presente.
+- [ ] **Passo 3.3 — Implementazione del Matching KMP in Tempo Reale ($O(n)$)**
+  - Algoritmo di scansione del testo con puntatore $i$ che **non torna mai indietro** (ideale per elaborare stream di dati e file enormi senza rileggerli!).
+  - Conteggio del numero esatto di confronti carattere per carattere.
+
+- [ ] **Passo 3.4 — La Sfida Teorica: KMP vs Naive (Worst-Case Showdown)**
+  - Progettare un generatore di "casi peggiori" (adversarial input) in cui l'algoritmo Naive ($O(n \cdot m)$) collassa e si inchioda, mentre KMP viaggia fluido in $O(n + m)$.
+  - Esempio classico: Testo `"AAAAAAAA...A"` (100.000 'A') contro Pattern `"AAAA...B"`.
+  - Misurazione dei tempi di esecuzione e del numero di comparazioni: tocca con mano perché KMP è geniale.
+
+- [ ] **Passo 3.5 — Test sui casi limite e Match Sovrapposti**
+  - Pattern non presente nel testo.
   - Pattern più lungo del testo.
-  - Match multipli e sovrapposti (es. `"AA"` in `"AAAA"`).
+  - Match multipli e parzialmente sovrapposti (es. cercare `"ABA"` in `"ABABA"` deve restituire indici 0 e 2).
+  - Test finale di memoria con Valgrind: zero bytes persi.
 
 ---
 
