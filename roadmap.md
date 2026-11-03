@@ -49,7 +49,7 @@ Questo ci permette di:
   - Stack (automatico, locale) vs Heap (`malloc` / `free`).
   - La regola d'oro: ownership della memoria e annullamento dangling pointer (`ptr = NULL`).
 
-- [ ] **Passo 1.4 — La prima Struct Moderna: `String_View`**
+- [x] **Passo 1.4 — La prima Struct Moderna: `String_View`**
   - Definizione della struct `String_View` (`data` e `count`).
   - Funzioni base:
     - `sv_from_cstr(const char *cstr)`
@@ -62,7 +62,7 @@ Questo ci permette di:
 
 ### FASE 2: Knuth-Morris-Pratt (Parte 1: Preprocessing e Tabella π con `String_View`)
 
-- [ ] **Passo 2.1 — Teoria della Failure Function ($\pi$) e i Bordi di una Stringa**
+- [x] **Passo 2.1 — Teoria della Failure Function ($\pi$) e i Bordi di una Stringa**
   - Definizione formale di *bordo* (prefisso e suffisso proprio comune).
   - Perché $\pi$ traccia la lunghezza del massimo bordo per ogni prefisso.
   - Esercizio su carta: calcolo manuale per `"ABABAC"` e `"AAAAAA"`.
